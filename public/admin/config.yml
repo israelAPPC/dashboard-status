@@ -44,5 +44,9 @@ collections:
           - { label: "Paralisado", value: "parado" }
           - { label: "Em desenvolvimento", value: "em-desenvolvimento" }
           - { label: "Finalizado", value: "finalizado" }
-      - { label: "Print (opcional)", name: "imagem", widget: "image", required: false }
+      - label: "Prints (opcional)"
+        name: "imagens"
+        widget: "list"
+        required: false
+        field: { label: "Imagem", name: "src", widget: "image" }
       - { label: "O que foi feito", name: "body", widget: "text" }

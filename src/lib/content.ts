@@ -15,7 +15,7 @@ export type Atualizacao = {
   data: string;
   modulo: string;
   status: Status;
-  imagem: string;
+  imagens: string[];
   corpo: string;
 };
 
@@ -27,6 +27,15 @@ function normalizarData(valor: unknown): string {
     return valor.toISOString().slice(0, 10);
   }
   return typeof valor === "string" ? valor : "";
+}
+
+function normalizarImagens(data: Record<string, unknown>): string[] {
+  if (Array.isArray(data.imagens)) {
+    return data.imagens
+      .map((item) => (typeof item === "string" ? item : (item as { src?: string })?.src ?? ""))
+      .filter(Boolean);
+  }
+  return typeof data.imagem === "string" && data.imagem ? [data.imagem] : [];
 }
 
 export function getModulos(): Modulo[] {
@@ -49,7 +58,7 @@ export function getAtualizacoes(): Atualizacao[] {
         data: normalizarData(data.data),
         modulo: data.modulo ?? "",
         status: (data.status ?? "em-desenvolvimento") as Status,
-        imagem: data.imagem ?? "",
+        imagens: normalizarImagens(data),
         corpo: content.trim(),
       };
     })

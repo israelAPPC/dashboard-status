@@ -60,15 +60,21 @@ export default async function ModuloPage({
               <h2 className="font-semibold text-slate-800 mb-2">{a.titulo}</h2>
               <p className="text-sm text-slate-600 whitespace-pre-line">{a.corpo}</p>
 
-              {a.imagem && (
-                <div className="mt-4 rounded-lg overflow-hidden border border-gray-100">
-                  <Image
-                    src={a.imagem}
-                    alt={a.titulo}
-                    width={1200}
-                    height={675}
-                    className="w-full h-auto"
-                  />
+              {a.imagens.length > 0 && (
+                <div
+                  className={`mt-4 grid gap-3 ${a.imagens.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}
+                >
+                  {a.imagens.map((src, i) => (
+                    <div key={src + i} className="rounded-lg overflow-hidden border border-gray-100">
+                      <Image
+                        src={src}
+                        alt={`${a.titulo} — imagem ${i + 1}`}
+                        width={1200}
+                        height={675}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
