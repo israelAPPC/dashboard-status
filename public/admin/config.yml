@@ -1,0 +1,44 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+site_url: https://SEU-SITE.netlify.app
+display_url: https://SEU-SITE.netlify.app
+logo_url: /favicon.ico
+
+locale: "pt"
+
+collections:
+  - name: "updates"
+    label: "Atualizações"
+    label_singular: "Atualização"
+    folder: "content/updates"
+    create: true
+    delete: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{data}} — {{titulo}} ({{modulo}})"
+    sortable_fields: ["data", "modulo", "status"]
+    fields:
+      - { label: "Título", name: "titulo", widget: "string" }
+      - { label: "Data", name: "data", widget: "datetime", format: "YYYY-MM-DD", date_format: "DD/MM/YYYY", time_format: false, picker_utc: true }
+      - label: "Módulo"
+        name: "modulo"
+        widget: "select"
+        options:
+          - { label: "Vendas", value: "vendas" }
+          - { label: "Orçamentos", value: "orcamentos" }
+          - { label: "Financeiro", value: "financeiro" }
+          - { label: "Roteirização", value: "roteirizacao" }
+          - { label: "Cadastros", value: "cadastros" }
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options:
+          - { label: "Paralisado", value: "parado" }
+          - { label: "Em desenvolvimento", value: "em-desenvolvimento" }
+          - { label: "Finalizado", value: "finalizado" }
+      - { label: "Print (opcional)", name: "imagem", widget: "image", required: false }
+      - { label: "O que foi feito", name: "body", widget: "text" }
