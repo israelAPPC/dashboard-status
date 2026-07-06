@@ -21,7 +21,7 @@ collections:
     folder: "content/updates"
     create: true
     delete: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{titulo}}"
     summary: "{{data}} — {{titulo}} ({{modulo}})"
     sortable_fields: ["data", "modulo", "status"]
     fields:
