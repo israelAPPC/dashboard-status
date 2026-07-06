@@ -1,5 +1,5 @@
 ---
-titulo: Início do módulo de Vendas
+titulo: O que já temos até a data
 data: 2026-07-06
 modulo: vendas
 status: em-desenvolvimento
