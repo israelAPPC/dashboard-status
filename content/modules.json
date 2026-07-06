@@ -3,5 +3,6 @@
   { "slug": "orcamentos", "nome": "Orçamentos" },
   { "slug": "financeiro", "nome": "Financeiro" },
   { "slug": "roteirizacao", "nome": "Roteirização" },
-  { "slug": "cadastros", "nome": "Cadastros" }
+  { "slug": "cadastros", "nome": "Cadastros" },
+  { "slug": "acesso-remoto", "nome": "Acesso pela Internet" }
 ]
