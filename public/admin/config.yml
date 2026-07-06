@@ -5,8 +5,8 @@ backend:
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-site_url: https://SEU-SITE.netlify.app
-display_url: https://SEU-SITE.netlify.app
+site_url: https://status-das-dygnus.netlify.app
+display_url: https://status-das-dygnus.netlify.app
 logo_url: /favicon.ico
 
 locale: "pt"
