@@ -7,6 +7,7 @@ imagem: /uploads/orcamentos_lista.png
 imagens:
   - /uploads/orcamentos_kanban.png
   - /uploads/orcamento_digitacao.png
+  - /uploads/orcamentos_lista.png
 ---
 - Consulta de Orçamentos: Consulta todos os orçamentos do Dygnus e podemos filtrar por status (Em Negociação, Vencidos, Liberados para Faturamento, Faturas, Cancelados).
 
