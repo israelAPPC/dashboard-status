@@ -1,6 +1,9 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: israelAPPC/dashboard-status
   branch: main
+  base_url: https://status-dash-dygnus.netlify.app
+  auth_endpoint: api/auth
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
