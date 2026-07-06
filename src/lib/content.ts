@@ -22,6 +22,13 @@ export type Atualizacao = {
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const UPDATES_DIR = path.join(CONTENT_DIR, "updates");
 
+function normalizarData(valor: unknown): string {
+  if (valor instanceof Date) {
+    return valor.toISOString().slice(0, 10);
+  }
+  return typeof valor === "string" ? valor : "";
+}
+
 export function getModulos(): Modulo[] {
   const file = path.join(CONTENT_DIR, "modules.json");
   return JSON.parse(fs.readFileSync(file, "utf8"));
@@ -39,7 +46,7 @@ export function getAtualizacoes(): Atualizacao[] {
       return {
         slug: filename.replace(/\.md$/, ""),
         titulo: data.titulo ?? "",
-        data: data.data ?? "",
+        data: normalizarData(data.data),
         modulo: data.modulo ?? "",
         status: (data.status ?? "em-desenvolvimento") as Status,
         imagem: data.imagem ?? "",
