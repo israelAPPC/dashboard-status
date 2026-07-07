@@ -21,5 +21,5 @@ fabianamoveis.dygnusdash.com.br
 
 Cada um configurado para acessar sua própria base de dados. 
 
-Estou estudando só como iniciar os serviços (dashboard - servidor netx.js e CloudFlare - serviço de Tunnel).
+Estou estudando como iniciar os serviços (dashboard - servidor netx.js e CloudFlare - serviço de Tunnel).
 
