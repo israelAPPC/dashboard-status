@@ -6,6 +6,7 @@ status: em-desenvolvimento
 imagens:
   - /uploads/rot_1png.png
   - /uploads/roteirizacao2.png
+  - /uploads/untitled1.png
 ---
 - Exibe os pedidos do Dygnus que possuem ao menos 1 item não entregue (configuração deve ser habilitada no Dygnus);
 - Selecionamos o pedido e com uma API configurada para o MapBox (permite até 100k requisições de graça), monta a rota mais otimizada, baseada no ponto de partida (API e ponto de partida estão na configuração);
