@@ -4,6 +4,9 @@ data: 2026-07-06
 modulo: vendas
 status: em-desenvolvimento
 imagem: /uploads/vendas.png
+imagens:
+  - /uploads/formas_de_pgto.png
+  - /uploads/ranking.png
 ---
 Indicadores de vendas já estão conferidos em duas situações: clientes 100% fiscal e clientes 100% pedido de venda.
 Valores em dias e períodos aleatórios foram conferidos e vimos que no relatório mais usado do sistema (Documentos Emitidos) os valores das vendas são: Preço do Produto + Impostos + Frete + Acréscimos - Descontos. Mantive assim no Dashboard.
