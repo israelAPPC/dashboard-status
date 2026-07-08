@@ -37,6 +37,7 @@ collections:
           - { label: "Roteirização", value: "roteirizacao" }
           - { label: "Cadastros", value: "cadastros" }
           - { label: "Acesso pela Internet", value: "acesso-remoto" }
+          - { label: "Melhorias / Ajustes Gerais", value: "melhorias-gerais" }
       - label: "Status"
         name: "status"
         widget: "select"
