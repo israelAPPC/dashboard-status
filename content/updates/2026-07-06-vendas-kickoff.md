@@ -2,7 +2,7 @@
 titulo: O que temos até a data
 data: 2026-07-06
 modulo: vendas
-status: em-desenvolvimento
+status: finalizado
 imagem: /uploads/vendas.png
 imagens:
   - /uploads/formas_de_pgto.png
