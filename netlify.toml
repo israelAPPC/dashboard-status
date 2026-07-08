@@ -17,3 +17,4 @@
   for = "/admin/*"
   [headers.values]
     X-Frame-Options = "DENY"
+    Cache-Control = "no-cache, no-store, must-revalidate"
