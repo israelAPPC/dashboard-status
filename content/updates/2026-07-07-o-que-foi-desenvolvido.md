@@ -2,7 +2,7 @@
 titulo: O que foi desenvolvido
 data: 2026-07-07
 modulo: roteirizacao
-status: em-desenvolvimento
+status: finalizado
 imagens:
   - /uploads/rot_1png.png
   - /uploads/roteirizacao2.png
