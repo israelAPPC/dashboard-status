@@ -2,7 +2,7 @@
 titulo: O que temos até a data
 data: 2026-07-07
 modulo: financeiro
-status: em-desenvolvimento
+status: finalizado
 imagens:
   - /uploads/fluxo_caixa.png
   - /uploads/dre.png
