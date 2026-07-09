@@ -51,6 +51,11 @@ export default async function CardPage({
             {TIPO_LABEL[card.tipo]}
           </span>
         )}
+        {card.autor_nome && (
+          <span className="text-xs text-slate-400">
+            reportado por <span className="font-medium text-slate-500">{card.autor_nome}</span>
+          </span>
+        )}
       </div>
 
       {card.descricao && <p className="text-sm text-slate-600 mb-6 whitespace-pre-line">{card.descricao}</p>}

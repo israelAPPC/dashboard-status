@@ -156,6 +156,7 @@ export async function criarDemanda(params: {
   descricao: string;
   tipo: TipoDemanda;
   autorId: string;
+  autorNome: string | null;
 }): Promise<Card> {
   const categoria = await getCategoriaDemandasExternas(params.projetoId);
   if (!categoria) {
@@ -170,6 +171,7 @@ export async function criarDemanda(params: {
       status: "em-aberto",
       tipo: params.tipo,
       autor_id: params.autorId,
+      autor_nome: params.autorNome,
     })
     .select()
     .single();

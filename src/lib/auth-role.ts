@@ -16,3 +16,13 @@ export async function getUserId(): Promise<string | null> {
   const { data } = await getSupabase().auth.getUser();
   return data.user?.id ?? null;
 }
+
+/**
+ * Lê o nome legível do usuário logado (user_metadata.nome) direto da
+ * sessão atual, para gravar de forma pública junto do card criado.
+ */
+export async function getUserNome(): Promise<string | null> {
+  const { data } = await getSupabase().auth.getUser();
+  const nome = data.user?.user_metadata?.nome;
+  return typeof nome === "string" && nome.trim() ? nome.trim() : null;
+}

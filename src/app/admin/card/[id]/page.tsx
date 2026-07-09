@@ -185,6 +185,11 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
               {TIPO_LABEL[card.tipo]}
             </span>
           )}
+          {card.autor_nome && (
+            <span className="text-xs text-slate-400">
+              reportado por <span className="font-medium text-slate-500">{card.autor_nome}</span>
+            </span>
+          )}
         </div>
         <button onClick={handleExcluirCard} className="inline-flex items-center gap-1.5 text-xs text-red-500 hover:underline">
           <Trash2 className="w-3.5 h-3.5" />

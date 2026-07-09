@@ -31,6 +31,7 @@ export type Card = {
   status: Status;
   tipo: TipoDemanda | null;
   autor_id: string | null;
+  autor_nome: string | null;
   ordem: number;
   created_at: string;
   updated_at: string;

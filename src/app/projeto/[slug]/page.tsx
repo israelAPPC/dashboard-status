@@ -92,6 +92,11 @@ export default async function ProjetoPage({
                                     {TIPO_LABEL[card.tipo]}
                                   </span>
                                 )}
+                                {card.autor_nome && (
+                                  <p className="mt-1 text-[10px] text-slate-400 truncate">
+                                    por {card.autor_nome}
+                                  </p>
+                                )}
                               </Link>
                             ))
                           )}

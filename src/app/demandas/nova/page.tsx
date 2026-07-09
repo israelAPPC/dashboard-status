@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
-import { getUserRole, getUserId } from "@/lib/auth-role";
+import { getUserRole, getUserId, getUserNome } from "@/lib/auth-role";
 import { getProjetos, criarDemanda, criarAnexo } from "@/lib/kanban";
 import BackLink from "@/components/BackLink";
 import type { Projeto, TipoDemanda } from "@/lib/supabase-types";
@@ -96,6 +96,7 @@ function NovaDemandaForm() {
     try {
       const autorId = await getUserId();
       if (!autorId) throw new Error("Sessão inválida. Faça login novamente.");
+      const autorNome = await getUserNome();
 
       const card = await criarDemanda({
         projetoId,
@@ -103,6 +104,7 @@ function NovaDemandaForm() {
         descricao: descricao.trim(),
         tipo,
         autorId,
+        autorNome,
       });
 
       for (const arquivo of imagens) {
