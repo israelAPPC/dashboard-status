@@ -1,4 +1,4 @@
-import type { Status } from "./content";
+import type { Status } from "./supabase-types";
 
 export const STATUS_LABEL: Record<Status, string> = {
   parado: "Paralisado",
