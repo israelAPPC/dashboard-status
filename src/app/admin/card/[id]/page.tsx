@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, Pencil, Trash2, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
@@ -23,6 +23,7 @@ const STATUS_OPCOES: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "e
 
 export default function AdminCardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const [card, setCard] = useState<Card | null>(null);
   const [iteracoes, setIteracoes] = useState<Iteracao[]>([]);
   const [anexos, setAnexos] = useState<Anexo[]>([]);
@@ -124,6 +125,14 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
     setEditArquivos([]);
   }
 
+  function handleVoltar() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/admin");
+    }
+  }
+
   function handleRemoverArquivoSelecionado(index: number) {
     setArquivos((prev) => prev.filter((_, i) => i !== index));
   }
@@ -159,10 +168,14 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
 
   return (
     <div>
-      <Link href="/admin" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#2c98b0] transition-colors mb-6">
+      <button
+        type="button"
+        onClick={handleVoltar}
+        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#2c98b0] transition-colors mb-6"
+      >
         <ArrowLeft className="w-4 h-4" />
         Voltar
-      </Link>
+      </button>
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-slate-800">Card #{card.numero_demanda}</h1>
