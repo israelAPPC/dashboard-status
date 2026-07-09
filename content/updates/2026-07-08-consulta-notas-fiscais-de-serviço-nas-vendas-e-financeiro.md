@@ -2,7 +2,7 @@
 titulo: Consulta Notas Fiscais de Serviço nas Vendas e Financeiro
 data: 2026-07-07
 modulo: vendas
-status: em-desenvolvimento
+status: finalizado
 imagens:
   - /uploads/filtro_nfs-e.png
   - /uploads/nfs-e_exibida.png
