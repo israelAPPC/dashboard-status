@@ -9,4 +9,4 @@ imagens:
 ---
 Versões anteriores não consideravam nas vendas a nota fiscal de serviço.
 Fiz o filtro em uma base de dados e está exibindo agora no filtro "Todos" e NFS-e.
-Mais teste sserão realizados.
+Mais teste serão realizados.
