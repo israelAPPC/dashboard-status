@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
 import {
   getCardPorId,
@@ -12,6 +12,7 @@ import {
   atualizarCard,
   excluirCard,
   criarIteracao,
+  atualizarIteracao,
   criarAnexo,
   excluirAnexo,
 } from "@/lib/kanban";
@@ -32,6 +33,10 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [editCorpo, setEditCorpo] = useState("");
+  const [editArquivo, setEditArquivo] = useState<File | null>(null);
+  const [salvandoEdicao, setSalvandoEdicao] = useState(false);
 
   async function carregar() {
     const c = await getCardPorId(id);
@@ -103,6 +108,42 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
       await carregar();
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Erro ao excluir anexo.");
+    }
+  }
+
+  function handleIniciarEdicao(it: Iteracao) {
+    setEditandoId(it.id);
+    setEditCorpo(it.corpo);
+    setEditArquivo(null);
+    setErro(null);
+  }
+
+  function handleCancelarEdicao() {
+    setEditandoId(null);
+    setEditCorpo("");
+    setEditArquivo(null);
+  }
+
+  async function handleSalvarEdicaoIteracao(iteracaoId: string) {
+    setSalvandoEdicao(true);
+    setErro(null);
+    try {
+      await atualizarIteracao(iteracaoId, editCorpo.trim());
+      if (editArquivo) {
+        const caminho = `${id}/${Date.now()}-${editArquivo.name}`;
+        const { error: uploadError } = await getSupabase()
+          .storage.from(STORAGE_BUCKET)
+          .upload(caminho, editArquivo);
+        if (uploadError) throw uploadError;
+        const { data: pub } = getSupabase().storage.from(STORAGE_BUCKET).getPublicUrl(caminho);
+        await criarAnexo({ cardId: id, iteracaoId, url: pub.publicUrl, nome: editArquivo.name });
+      }
+      handleCancelarEdicao();
+      await carregar();
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro ao salvar edição.");
+    } finally {
+      setSalvandoEdicao(false);
     }
   }
 
@@ -192,27 +233,91 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
       <div className="space-y-4">
         {iteracoes.map((it) => {
           const anexosIteracao = anexos.filter((a) => a.iteracao_id === it.id);
+          const emEdicao = editandoId === it.id;
           return (
             <div key={it.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <p className="text-xs text-slate-400 mb-2">
-                {new Date(it.data + "T00:00:00").toLocaleDateString("pt-BR")}
-              </p>
-              <p className="text-sm text-slate-600 whitespace-pre-line">{it.corpo}</p>
-              {anexosIteracao.length > 0 && (
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  {anexosIteracao.map((anexo) => (
-                    <div key={anexo.id} className="relative rounded-lg overflow-hidden border border-gray-100">
-                      <Image src={anexo.url} alt={anexo.nome ?? ""} width={400} height={225} className="w-full h-auto" />
-                      <button
-                        onClick={() => handleExcluirAnexo(anexo.id)}
-                        className="absolute top-1 right-1 bg-white/90 rounded-full p-1 text-red-500 hover:bg-white"
-                        title="Excluir anexo"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <p className="text-xs text-slate-400">
+                  {new Date(it.data + "T00:00:00").toLocaleDateString("pt-BR")}
+                </p>
+                {!emEdicao && (
+                  <button
+                    onClick={() => handleIniciarEdicao(it)}
+                    className="inline-flex items-center gap-1 text-xs text-[#2c98b0] hover:underline shrink-0"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Editar
+                  </button>
+                )}
+              </div>
+
+              {emEdicao ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={editCorpo}
+                    onChange={(e) => setEditCorpo(e.target.value)}
+                    rows={3}
+                    className="w-full text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setEditArquivo(e.target.files?.[0] ?? null)}
+                    className="text-xs"
+                  />
+                  {anexosIteracao.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {anexosIteracao.map((anexo) => (
+                        <div key={anexo.id} className="relative rounded-lg overflow-hidden border border-gray-100">
+                          <Image src={anexo.url} alt={anexo.nome ?? ""} width={400} height={225} className="w-full h-auto" />
+                          <button
+                            onClick={() => handleExcluirAnexo(anexo.id)}
+                            className="absolute top-1 right-1 bg-white/90 rounded-full p-1 text-red-500 hover:bg-white"
+                            title="Excluir anexo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleSalvarEdicaoIteracao(it.id)}
+                      disabled={salvandoEdicao}
+                      className="inline-flex items-center gap-1.5 bg-[#2c98b0] hover:bg-[#2c98b0]/90 disabled:opacity-60 text-white font-medium text-sm px-3 py-2 rounded-md transition-colors"
+                    >
+                      {salvandoEdicao ? "Salvando..." : "Salvar"}
+                    </button>
+                    <button
+                      onClick={handleCancelarEdicao}
+                      className="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-700 text-sm px-3 py-2 rounded-md transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Cancelar
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <p className="text-sm text-slate-600 whitespace-pre-line">{it.corpo}</p>
+                  {anexosIteracao.length > 0 && (
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {anexosIteracao.map((anexo) => (
+                        <div key={anexo.id} className="relative rounded-lg overflow-hidden border border-gray-100">
+                          <Image src={anexo.url} alt={anexo.nome ?? ""} width={400} height={225} className="w-full h-auto" />
+                          <button
+                            onClick={() => handleExcluirAnexo(anexo.id)}
+                            className="absolute top-1 right-1 bg-white/90 rounded-full p-1 text-red-500 hover:bg-white"
+                            title="Excluir anexo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           );

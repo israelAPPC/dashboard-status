@@ -165,6 +165,17 @@ export async function criarIteracao(cardId: string, corpo: string, data?: string
   return row as Iteracao;
 }
 
+export async function atualizarIteracao(id: string, corpo: string) {
+  const { data, error } = await getSupabase()
+    .from("iteracoes")
+    .update({ corpo })
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Iteracao;
+}
+
 export async function criarAnexo(params: { cardId?: string; iteracaoId?: string; url: string; nome?: string }) {
   const { data, error } = await getSupabase()
     .from("anexos")
