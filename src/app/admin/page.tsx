@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, Plus, Users } from "lucide-react";
 import { getProjetos, criarProjeto } from "@/lib/kanban";
 import type { Projeto } from "@/lib/supabase-types";
 
@@ -52,7 +52,16 @@ export default function AdminHomePage() {
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-slate-800 mb-6">Administração — Projetos</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-xl font-semibold text-slate-800">Administração — Projetos</h1>
+        <Link
+          href="/admin/usuarios"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[#2c98b0] hover:text-[#2c98b0]/80 transition-colors"
+        >
+          <Users className="w-4 h-4" />
+          Usuários externos
+        </Link>
+      </div>
 
       <form onSubmit={handleCriar} className="flex gap-2 mb-6">
         <input
