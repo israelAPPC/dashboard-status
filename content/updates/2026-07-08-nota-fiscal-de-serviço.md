@@ -9,4 +9,3 @@ imagens:
   - /uploads/dre_servico.png
 ---
 Nota Fiscal de Serviço sendo considerada no contas a receber. Modificação para que o documento fosse exibido na tela de vendas, também passou a mostrar os dados à receber no financeiro, DRE e fluxo de caixa.
-Mais testes serão realizados.
