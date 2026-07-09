@@ -30,12 +30,12 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
   const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState<Status>("em-aberto");
   const [novaIteracao, setNovaIteracao] = useState("");
-  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [arquivos, setArquivos] = useState<File[]>([]);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [editCorpo, setEditCorpo] = useState("");
-  const [editArquivo, setEditArquivo] = useState<File | null>(null);
+  const [editArquivos, setEditArquivos] = useState<File[]>([]);
   const [salvandoEdicao, setSalvandoEdicao] = useState(false);
 
   async function carregar() {
@@ -83,7 +83,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
     setErro(null);
     try {
       const iteracao = await criarIteracao(id, novaIteracao.trim());
-      if (arquivo) {
+      for (const arquivo of arquivos) {
         const caminho = `${id}/${Date.now()}-${arquivo.name}`;
         const { error: uploadError } = await getSupabase()
           .storage.from(STORAGE_BUCKET)
@@ -93,7 +93,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
         await criarAnexo({ cardId: id, iteracaoId: iteracao.id, url: pub.publicUrl, nome: arquivo.name });
       }
       setNovaIteracao("");
-      setArquivo(null);
+      setArquivos([]);
       await carregar();
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Erro ao adicionar iteração.");
@@ -114,14 +114,22 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
   function handleIniciarEdicao(it: Iteracao) {
     setEditandoId(it.id);
     setEditCorpo(it.corpo);
-    setEditArquivo(null);
+    setEditArquivos([]);
     setErro(null);
   }
 
   function handleCancelarEdicao() {
     setEditandoId(null);
     setEditCorpo("");
-    setEditArquivo(null);
+    setEditArquivos([]);
+  }
+
+  function handleRemoverArquivoSelecionado(index: number) {
+    setArquivos((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleRemoverEditArquivoSelecionado(index: number) {
+    setEditArquivos((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function handleSalvarEdicaoIteracao(iteracaoId: string) {
@@ -129,7 +137,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
     setErro(null);
     try {
       await atualizarIteracao(iteracaoId, editCorpo.trim());
-      if (editArquivo) {
+      for (const editArquivo of editArquivos) {
         const caminho = `${id}/${Date.now()}-${editArquivo.name}`;
         const { error: uploadError } = await getSupabase()
           .storage.from(STORAGE_BUCKET)
@@ -217,9 +225,29 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
+          multiple
+          onChange={(e) => setArquivos((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
           className="text-xs"
         />
+        {arquivos.length > 0 && (
+          <ul className="space-y-1">
+            {arquivos.map((f, i) => (
+              <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 text-xs text-slate-600 bg-gray-50 rounded px-2 py-1">
+                <span className="truncate">
+                  {f.name} <span className="text-slate-400">({(f.size / 1024).toFixed(0)} KB)</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoverArquivoSelecionado(i)}
+                  className="text-red-500 hover:text-red-600 shrink-0"
+                  title="Remover"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
         <button
           type="submit"
           disabled={salvando}
@@ -262,9 +290,29 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
                   <input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => setEditArquivo(e.target.files?.[0] ?? null)}
+                    multiple
+                    onChange={(e) => setEditArquivos((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
                     className="text-xs"
                   />
+                  {editArquivos.length > 0 && (
+                    <ul className="space-y-1">
+                      {editArquivos.map((f, i) => (
+                        <li key={`${f.name}-${i}`} className="flex items-center justify-between gap-2 text-xs text-slate-600 bg-gray-50 rounded px-2 py-1">
+                          <span className="truncate">
+                            {f.name} <span className="text-slate-400">({(f.size / 1024).toFixed(0)} KB)</span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoverEditArquivoSelecionado(i)}
+                            className="text-red-500 hover:text-red-600 shrink-0"
+                            title="Remover"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {anexosIteracao.length > 0 && (
                     <div className="grid grid-cols-2 gap-2">
                       {anexosIteracao.map((anexo) => (
