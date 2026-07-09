@@ -36,19 +36,25 @@ export default async function ProjetoPage({
       {categorias.length === 0 ? (
         <p className="text-sm text-slate-400">Nenhuma categoria cadastrada ainda.</p>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {categorias.map((categoria) => {
             const cardsCategoria = cards.filter((c) => c.categoria_id === categoria.id);
             return (
-              <section key={categoria.id}>
-                <h2 className="font-semibold text-slate-700 mb-3">{categoria.nome}</h2>
+              <section
+                key={categoria.id}
+                className="bg-white rounded-xl border border-gray-100 shadow-sm p-5"
+              >
+                <h2 className="flex items-center gap-2.5 text-base font-semibold text-slate-800 mb-4">
+                  <span className="w-1 h-5 rounded-full bg-[#2c98b0]" />
+                  {categoria.nome}
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {COLUNAS.map((status) => {
                     const cardsColuna = cardsCategoria
                       .filter((c) => c.status === status)
                       .sort((a, b) => a.ordem - b.ordem);
                     return (
-                      <div key={status} className="bg-gray-50 rounded-xl border border-gray-100 p-3">
+                      <div key={status} className="bg-gray-50 rounded-lg border border-gray-100 p-3">
                         <div className="flex items-center gap-1.5 mb-3 px-1">
                           <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[status]}`} />
                           <span className="text-xs font-medium text-slate-500">

@@ -43,6 +43,26 @@ export async function getCardsPorCategorias(categoriaIds: string[]): Promise<Car
   return data ?? [];
 }
 
+export async function getCategoriaPorId(id: string): Promise<Categoria | null> {
+  const { data, error } = await getSupabase()
+    .from("categorias")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function getProjetoPorId(id: string): Promise<Projeto | null> {
+  const { data, error } = await getSupabase()
+    .from("projetos")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function getCardPorId(id: string): Promise<Card | null> {
   const { data, error } = await getSupabase()
     .from("cards")

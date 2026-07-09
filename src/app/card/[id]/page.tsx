@@ -1,9 +1,14 @@
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
-import { getCardPorId, getIteracoesPorCard, getAnexosPorCard } from "@/lib/kanban";
+import {
+  getCardPorId,
+  getIteracoesPorCard,
+  getAnexosPorCard,
+  getCategoriaPorId,
+  getProjetoPorId,
+} from "@/lib/kanban";
 import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT } from "@/lib/status";
+import BackLink from "@/components/BackLink";
 
 export const revalidate = 0;
 
@@ -16,6 +21,10 @@ export default async function CardPage({
   const card = await getCardPorId(id);
   if (!card) notFound();
 
+  const categoria = await getCategoriaPorId(card.categoria_id);
+  const projeto = categoria ? await getProjetoPorId(categoria.projeto_id) : null;
+  const fallbackHref = projeto ? `/projeto/${projeto.slug}` : "/";
+
   const [iteracoes, anexos] = await Promise.all([
     getIteracoesPorCard(card.id),
     getAnexosPorCard(card.id),
@@ -23,13 +32,7 @@ export default async function CardPage({
 
   return (
     <div>
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-[#2c98b0] transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Voltar
-      </Link>
+      <BackLink fallbackHref={fallbackHref} label="Voltar" />
 
       <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
         <h1 className="text-xl font-semibold text-slate-800">{card.titulo}</h1>
