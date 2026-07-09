@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { X } from "lucide-react";
+import { ImagePlus, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
 import { getUserRole, getUserId, getUserNome } from "@/lib/auth-role";
 import { getProjetos, criarDemanda, criarAnexo } from "@/lib/kanban";
@@ -27,6 +27,7 @@ function NovaDemandaForm() {
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [sucesso, setSucesso] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let ativo = true;
@@ -69,6 +70,7 @@ function NovaDemandaForm() {
       return;
     }
     setImagens(combinados);
+    e.target.value = "";
   }
 
   function handleRemoverImagem(index: number) {
@@ -228,27 +230,55 @@ function NovaDemandaForm() {
           <label className="block text-xs font-medium text-slate-500 mb-1">
             Imagens (obrigatório, até {MAX_IMAGENS}, {MAX_TAMANHO_MB}MB cada)
           </label>
-          <input type="file" accept="image/*" multiple onChange={handleSelecionarArquivos} className="text-xs" />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleSelecionarArquivos}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={imagens.length >= MAX_IMAGENS}
+            className="inline-flex items-center gap-1.5 bg-[#2c98b0] hover:bg-[#2c98b0]/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium text-sm px-3 py-2 rounded-md transition-colors"
+          >
+            <ImagePlus className="w-4 h-4" />
+            Selecionar imagens
+          </button>
           {imagens.length > 0 && (
             <ul className="space-y-1 mt-2">
-              {imagens.map((f, i) => (
-                <li
-                  key={`${f.name}-${i}`}
-                  className="flex items-center justify-between gap-2 text-xs text-slate-600 bg-gray-50 rounded px-2 py-1"
-                >
-                  <span className="truncate">
-                    {f.name} <span className="text-slate-400">({(f.size / 1024).toFixed(0)} KB)</span>
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoverImagem(i)}
-                    className="text-red-500 hover:text-red-600 shrink-0"
-                    title="Remover"
+              {imagens.map((f, i) => {
+                const previewUrl = URL.createObjectURL(f);
+                return (
+                  <li
+                    key={`${f.name}-${i}`}
+                    className="flex items-center justify-between gap-2 text-xs text-slate-600 bg-gray-50 rounded px-2 py-1"
                   >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </li>
-              ))}
+                    <span className="flex items-center gap-2 truncate">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={previewUrl}
+                        alt={f.name}
+                        className="w-8 h-8 rounded object-cover shrink-0 border border-gray-200"
+                        onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
+                      />
+                      <span className="truncate">
+                        {f.name} <span className="text-slate-400">({(f.size / 1024).toFixed(0)} KB)</span>
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoverImagem(i)}
+                      className="text-red-500 hover:text-red-600 shrink-0"
+                      title="Remover"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
