@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { BarChart2 } from "lucide-react";
+import Image from "next/image";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,8 +33,8 @@ export default function RootLayout({
         <header className="sticky top-0 z-30 bg-white border-b border-gray-100">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-2.5">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-lg bg-[#2c98b0]/10 flex items-center justify-center">
-                <BarChart2 className="w-5 h-5 text-[#2c98b0]" />
+              <div className="w-9 h-9 rounded-lg bg-[#2c98b0]/10 flex items-center justify-center overflow-hidden">
+                <Image src="/dygnus-icon.ico" alt="Dygnus" width={22} height={22} />
               </div>
               <div className="leading-tight">
                 <p className="font-semibold text-slate-800 text-sm">Dygnus Dashboard</p>
@@ -44,9 +44,6 @@ export default function RootLayout({
           </div>
         </header>
         <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 py-8">{children}</main>
-        <footer className="text-center text-xs text-slate-400 py-6">
-          Atualizado periodicamente pela equipe de desenvolvimento
-        </footer>
       </body>
     </html>
   );
