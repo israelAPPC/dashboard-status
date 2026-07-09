@@ -7,7 +7,7 @@ import {
   getCategoriaPorId,
   getProjetoPorId,
 } from "@/lib/kanban";
-import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT } from "@/lib/status";
+import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
 import BackLink from "@/components/BackLink";
 
 export const revalidate = 0;
@@ -39,12 +39,19 @@ export default async function CardPage({
         <span className="text-xs font-mono text-slate-400">#{card.numero_demanda}</span>
       </div>
 
-      <span
-        className={`inline-flex w-fit items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium mb-6 ${STATUS_CLASSES[card.status]}`}
-      >
-        <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[card.status]}`} />
-        {STATUS_LABEL[card.status]}
-      </span>
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
+        <span
+          className={`inline-flex w-fit items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_CLASSES[card.status]}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[card.status]}`} />
+          {STATUS_LABEL[card.status]}
+        </span>
+        {card.tipo && (
+          <span className={`inline-flex w-fit items-center px-2.5 py-1 rounded-full text-xs font-medium ${TIPO_CLASSES[card.tipo]}`}>
+            {TIPO_LABEL[card.tipo]}
+          </span>
+        )}
+      </div>
 
       {card.descricao && <p className="text-sm text-slate-600 mb-6 whitespace-pre-line">{card.descricao}</p>}
 

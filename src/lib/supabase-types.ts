@@ -1,5 +1,9 @@
 export type Status = "em-aberto" | "parado" | "em-desenvolvimento" | "em-teste" | "finalizado";
 
+export type TipoDemanda = "erro" | "melhoria";
+
+export type UserRole = "admin" | "externo";
+
 export type Projeto = {
   id: string;
   nome: string;
@@ -25,6 +29,8 @@ export type Card = {
   titulo: string;
   descricao: string | null;
   status: Status;
+  tipo: TipoDemanda | null;
+  autor_id: string | null;
   ordem: number;
   created_at: string;
   updated_at: string;

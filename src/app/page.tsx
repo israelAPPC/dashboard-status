@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { getProjetos } from "@/lib/kanban";
+import ReportarDemandaLink from "@/components/ReportarDemandaLink";
 
 export const revalidate = 0;
 
@@ -9,11 +10,14 @@ export default async function Home() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-slate-800">Projetos</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Selecione um projeto para ver o Kanban de acompanhamento.
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-semibold text-slate-800">Projetos</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Selecione um projeto para ver o Kanban de acompanhamento.
+          </p>
+        </div>
+        <ReportarDemandaLink />
       </div>
 
       {projetos.length === 0 ? (

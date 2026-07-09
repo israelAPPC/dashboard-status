@@ -16,7 +16,7 @@ import {
   criarAnexo,
   excluirAnexo,
 } from "@/lib/kanban";
-import { STATUS_LABEL } from "@/lib/status";
+import { STATUS_LABEL, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
 import type { Anexo, Card, Iteracao, Status } from "@/lib/supabase-types";
 
 const STATUS_OPCOES: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "em-teste", "finalizado"];
@@ -178,7 +178,14 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
       </button>
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-slate-800">Card #{card.numero_demanda}</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="text-xl font-semibold text-slate-800">Card #{card.numero_demanda}</h1>
+          {card.tipo && (
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${TIPO_CLASSES[card.tipo]}`}>
+              {TIPO_LABEL[card.tipo]}
+            </span>
+          )}
+        </div>
         <button onClick={handleExcluirCard} className="inline-flex items-center gap-1.5 text-xs text-red-500 hover:underline">
           <Trash2 className="w-3.5 h-3.5" />
           Excluir card

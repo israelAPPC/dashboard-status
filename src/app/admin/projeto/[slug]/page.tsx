@@ -10,7 +10,7 @@ import {
   criarCard,
   atualizarCard,
 } from "@/lib/kanban";
-import { STATUS_LABEL, STATUS_DOT } from "@/lib/status";
+import { STATUS_LABEL, STATUS_DOT, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
 import type { Card, Categoria, Projeto, Status } from "@/lib/supabase-types";
 
 const COLUNAS: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "em-teste", "finalizado"];
@@ -33,6 +33,11 @@ function CardChip({ card }: { card: Card }) {
         <p className="text-sm font-medium text-slate-800 line-clamp-2">{card.titulo}</p>
         <span className="shrink-0 text-[10px] font-mono text-slate-400">#{card.numero_demanda}</span>
       </div>
+      {card.tipo && (
+        <span className={`inline-block mt-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${TIPO_CLASSES[card.tipo]}`}>
+          {TIPO_LABEL[card.tipo]}
+        </span>
+      )}
       <Link
         href={`/admin/card/${card.id}`}
         onPointerDown={(e) => e.stopPropagation()}

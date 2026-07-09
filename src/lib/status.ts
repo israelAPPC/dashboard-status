@@ -1,4 +1,4 @@
-import type { Status } from "./supabase-types";
+import type { Status, TipoDemanda } from "./supabase-types";
 
 export const STATUS_LABEL: Record<Status, string> = {
   "em-aberto": "Em aberto/análise",
@@ -22,4 +22,14 @@ export const STATUS_DOT: Record<Status, string> = {
   "em-desenvolvimento": "bg-amber-500",
   "em-teste": "bg-indigo-500",
   finalizado: "bg-emerald-500",
+};
+
+export const TIPO_LABEL: Record<TipoDemanda, string> = {
+  erro: "Erro",
+  melhoria: "Melhoria",
+};
+
+export const TIPO_CLASSES: Record<TipoDemanda, string> = {
+  erro: "bg-red-50 text-red-600 ring-1 ring-red-100",
+  melhoria: "bg-sky-50 text-sky-600 ring-1 ring-sky-100",
 };

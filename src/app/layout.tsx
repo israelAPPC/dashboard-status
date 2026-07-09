@@ -40,6 +40,7 @@ export default function RootLayout({
               <div className="leading-tight">
                 <p className="font-semibold text-slate-800 text-sm">Dygnus Dashboard</p>
                 <p className="text-xs text-slate-500">Acompanhamento de desenvolvimento</p>
+                <p className="text-xs text-slate-400">Projetos Inovação / Melhorias</p>
               </div>
             </Link>
             <Link

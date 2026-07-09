@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getProjetoPorSlug, getCategoriasPorProjeto, getCardsPorCategorias } from "@/lib/kanban";
-import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT } from "@/lib/status";
+import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
+import ReportarDemandaLink from "@/components/ReportarDemandaLink";
 import type { Status } from "@/lib/supabase-types";
 
 export const revalidate = 0;
@@ -31,7 +32,10 @@ export default async function ProjetoPage({
         Voltar aos projetos
       </Link>
 
-      <h1 className="text-xl font-semibold text-slate-800 mb-6">{projeto.nome}</h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+        <h1 className="text-xl font-semibold text-slate-800">{projeto.nome}</h1>
+        <ReportarDemandaLink projetoSlug={projeto.slug} />
+      </div>
 
       {categorias.length === 0 ? (
         <p className="text-sm text-slate-400">Nenhuma categoria cadastrada ainda.</p>
@@ -81,6 +85,13 @@ export default async function ProjetoPage({
                                     #{card.numero_demanda}
                                   </span>
                                 </div>
+                                {card.tipo && (
+                                  <span
+                                    className={`inline-block mt-1.5 text-[10px] font-medium px-1.5 py-0.5 rounded-full ${TIPO_CLASSES[card.tipo]}`}
+                                  >
+                                    {TIPO_LABEL[card.tipo]}
+                                  </span>
+                                )}
                               </Link>
                             ))
                           )}

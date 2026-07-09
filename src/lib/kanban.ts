@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabase";
-import type { Anexo, Card, Categoria, Iteracao, Projeto, Status } from "@/lib/supabase-types";
+import type { Anexo, Card, Categoria, Iteracao, Projeto, Status, TipoDemanda } from "@/lib/supabase-types";
 
 // ---------- Leitura (pública) ----------
 
@@ -41,6 +41,17 @@ export async function getCardsPorCategorias(categoriaIds: string[]): Promise<Car
     .order("ordem", { ascending: true });
   if (error) throw error;
   return data ?? [];
+}
+
+export async function getCategoriaDemandasExternas(projetoId: string): Promise<Categoria | null> {
+  const { data, error } = await getSupabase()
+    .from("categorias")
+    .select("*")
+    .eq("projeto_id", projetoId)
+    .eq("slug", "demandas-externas")
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 export async function getCategoriaPorId(id: string): Promise<Categoria | null> {
@@ -129,6 +140,37 @@ export async function criarCard(categoriaId: string, titulo: string, status: Sta
   const { data, error } = await getSupabase()
     .from("cards")
     .insert({ categoria_id: categoriaId, titulo, status, descricao: descricao ?? null, ordem })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Card;
+}
+
+/**
+ * Cria uma demanda externa (erro/melhoria) como card na categoria fixa
+ * "Demandas Externas" do projeto informado. Autor = usuário externo logado.
+ */
+export async function criarDemanda(params: {
+  projetoId: string;
+  titulo: string;
+  descricao: string;
+  tipo: TipoDemanda;
+  autorId: string;
+}): Promise<Card> {
+  const categoria = await getCategoriaDemandasExternas(params.projetoId);
+  if (!categoria) {
+    throw new Error("Categoria de Demandas Externas não encontrada para este projeto.");
+  }
+  const { data, error } = await getSupabase()
+    .from("cards")
+    .insert({
+      categoria_id: categoria.id,
+      titulo: params.titulo,
+      descricao: params.descricao,
+      status: "em-aberto",
+      tipo: params.tipo,
+      autor_id: params.autorId,
+    })
     .select()
     .single();
   if (error) throw error;
