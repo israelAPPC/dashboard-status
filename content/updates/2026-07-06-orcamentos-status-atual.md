@@ -2,7 +2,7 @@
 titulo: O que temos até a data
 data: 2026-07-06
 modulo: orcamentos
-status: em-desenvolvimento
+status: finalizado
 imagem: /uploads/orcamentos_lista.png
 imagens:
   - /uploads/orcamentos_kanban.png
