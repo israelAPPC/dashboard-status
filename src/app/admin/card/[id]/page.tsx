@@ -18,7 +18,7 @@ import {
 import { STATUS_LABEL } from "@/lib/status";
 import type { Anexo, Card, Iteracao, Status } from "@/lib/supabase-types";
 
-const STATUS_OPCOES: Status[] = ["parado", "em-desenvolvimento", "finalizado"];
+const STATUS_OPCOES: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "em-teste", "finalizado"];
 
 export default function AdminCardPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -27,7 +27,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
   const [anexos, setAnexos] = useState<Anexo[]>([]);
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [status, setStatus] = useState<Status>("parado");
+  const [status, setStatus] = useState<Status>("em-aberto");
   const [novaIteracao, setNovaIteracao] = useState("");
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [salvando, setSalvando] = useState(false);

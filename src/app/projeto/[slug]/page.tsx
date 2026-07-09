@@ -7,7 +7,7 @@ import type { Status } from "@/lib/supabase-types";
 
 export const revalidate = 0;
 
-const COLUNAS: Status[] = ["parado", "em-desenvolvimento", "finalizado"];
+const COLUNAS: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "em-teste", "finalizado"];
 
 export default async function ProjetoPage({
   params,
@@ -48,7 +48,7 @@ export default async function ProjetoPage({
                   <span className="w-1 h-5 rounded-full bg-[#2c98b0]" />
                   {categoria.nome}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                   {COLUNAS.map((status) => {
                     const cardsColuna = cardsCategoria
                       .filter((c) => c.status === status)

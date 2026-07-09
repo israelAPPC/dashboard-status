@@ -13,7 +13,7 @@ import {
 import { STATUS_LABEL, STATUS_DOT } from "@/lib/status";
 import type { Card, Categoria, Projeto, Status } from "@/lib/supabase-types";
 
-const COLUNAS: Status[] = ["parado", "em-desenvolvimento", "finalizado"];
+const COLUNAS: Status[] = ["em-aberto", "parado", "em-desenvolvimento", "em-teste", "finalizado"];
 
 function CardChip({ card }: { card: Card }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: card.id });
@@ -117,7 +117,7 @@ export default function AdminProjetoPage({ params }: { params: Promise<{ slug: s
     const titulo = novoCard[categoriaId]?.trim();
     if (!titulo) return;
     try {
-      await criarCard(categoriaId, titulo, "parado");
+      await criarCard(categoriaId, titulo, "em-aberto");
       setNovoCard((s) => ({ ...s, [categoriaId]: "" }));
       await carregar();
     } catch (e) {
@@ -176,7 +176,7 @@ export default function AdminProjetoPage({ params }: { params: Promise<{ slug: s
             return (
               <section key={categoria.id}>
                 <h2 className="font-semibold text-slate-700 mb-3">{categoria.nome}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
                   {COLUNAS.map((status) => (
                     <Coluna
                       key={status}
@@ -190,7 +190,7 @@ export default function AdminProjetoPage({ params }: { params: Promise<{ slug: s
                   <input
                     value={novoCard[categoria.id] ?? ""}
                     onChange={(e) => setNovoCard((s) => ({ ...s, [categoria.id]: e.target.value }))}
-                    placeholder="Novo card (entra em Parado)"
+                    placeholder="Novo card (entra em Aberto/análise)"
                     className="flex-1 text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
                   />
                   <button

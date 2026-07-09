@@ -1,4 +1,4 @@
-export type Status = "parado" | "em-desenvolvimento" | "finalizado";
+export type Status = "em-aberto" | "parado" | "em-desenvolvimento" | "em-teste" | "finalizado";
 
 export type Projeto = {
   id: string;
