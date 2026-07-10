@@ -89,7 +89,8 @@ export async function getIteracoesPorCard(cardId: string): Promise<Iteracao[]> {
     .from("iteracoes")
     .select("*")
     .eq("card_id", cardId)
-    .order("data", { ascending: false });
+    .order("data", { ascending: false })
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }

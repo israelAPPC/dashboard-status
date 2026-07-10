@@ -21,13 +21,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     let ativo = true;
     getSupabase()
       .auth.getSession()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (!ativo) return;
         if (!data.session) {
           router.replace("/admin/login");
-        } else {
-          setPronto(true);
+          return;
         }
+        // Força a renovação do token: garante que claims como
+        // user_metadata.role reflitam qualquer alteração feita no
+        // Supabase Dashboard após o login (sem exigir logout manual).
+        await getSupabase().auth.refreshSession();
+        if (!ativo) return;
+        setPronto(true);
       });
 
     const { data: sub } = getSupabase().auth.onAuthStateChange((_event, session) => {

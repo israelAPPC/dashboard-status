@@ -254,6 +254,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
           onChange={(e) => setArquivos((prev) => [...prev, ...Array.from(e.target.files ?? [])])}
           className="text-xs"
         />
+        {erro && <p className="text-xs text-red-500">{erro}</p>}
         {arquivos.length > 0 && (
           <ul className="space-y-1">
             {arquivos.map((f, i) => (
