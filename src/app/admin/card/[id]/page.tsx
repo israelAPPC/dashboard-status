@@ -38,6 +38,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
   const [editCorpo, setEditCorpo] = useState("");
   const [editArquivos, setEditArquivos] = useState<File[]>([]);
   const [salvandoEdicao, setSalvandoEdicao] = useState(false);
+  const anexosDoCard = anexos.filter((a) => a.iteracao_id === null);
 
   async function carregar() {
     const c = await getCardPorId(id);
@@ -237,6 +238,26 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
           Salvar
         </button>
       </form>
+
+      {anexosDoCard.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-slate-700 mb-3">Anexos do relato</h2>
+          <div className="grid grid-cols-2 gap-2">
+            {anexosDoCard.map((anexo) => (
+              <div key={anexo.id} className="relative rounded-lg overflow-hidden border border-gray-100">
+                <Image src={anexo.url} alt={anexo.nome ?? ""} width={400} height={225} className="w-full h-auto" />
+                <button
+                  onClick={() => handleExcluirAnexo(anexo.id)}
+                  className="absolute top-1 right-1 bg-white/90 rounded-full p-1 text-red-500 hover:bg-white"
+                  title="Excluir anexo"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <h2 className="text-sm font-semibold text-slate-700 mb-3">Adicionar iteração (histórico)</h2>
       <form onSubmit={handleAdicionarIteracao} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-3 mb-8">

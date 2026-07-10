@@ -30,6 +30,8 @@ export default async function CardPage({
     getAnexosPorCard(card.id),
   ]);
 
+  const anexosDoCard = anexos.filter((a) => a.iteracao_id === null);
+
   return (
     <div>
       <BackLink fallbackHref={fallbackHref} label="Voltar" />
@@ -59,6 +61,25 @@ export default async function CardPage({
       </div>
 
       {card.descricao && <p className="text-sm text-slate-600 mb-6 whitespace-pre-line">{card.descricao}</p>}
+
+      {anexosDoCard.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-sm font-semibold text-slate-700 mb-3">Anexos do relato</h2>
+          <div className={`grid gap-3 ${anexosDoCard.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+            {anexosDoCard.map((anexo) => (
+              <div key={anexo.id} className="rounded-lg overflow-hidden border border-gray-100">
+                <Image
+                  src={anexo.url}
+                  alt={anexo.nome ?? card.titulo}
+                  width={1200}
+                  height={675}
+                  className="w-full h-auto"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <h2 className="text-sm font-semibold text-slate-700 mb-3">Histórico</h2>
 
