@@ -3,13 +3,15 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowLeft, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
+import { buildStorageUploadPath } from "@/lib/storage-path";
 import {
   getVersoesPorProjeto,
   getFuncionalidadesPorVersoes,
   getImagensPorFuncionalidades,
   criarVersao,
+  atualizarVersao,
   excluirVersao,
   criarFuncionalidade,
   atualizarFuncionalidade,
@@ -36,6 +38,17 @@ export default function AdminChangelogPage({ params }: { params: Promise<{ slug:
 
   const [arquivosPorFuncionalidade, setArquivosPorFuncionalidade] = useState<Record<string, File[]>>({});
   const [enviandoPorFuncionalidade, setEnviandoPorFuncionalidade] = useState<Record<string, boolean>>({});
+
+  const [versaoEditandoId, setVersaoEditandoId] = useState<string | null>(null);
+  const [editNumero, setEditNumero] = useState("");
+  const [editDescricaoVersao, setEditDescricaoVersao] = useState("");
+  const [salvandoVersao, setSalvandoVersao] = useState(false);
+
+  const [funcEditandoId, setFuncEditandoId] = useState<string | null>(null);
+  const [editFuncNome, setEditFuncNome] = useState("");
+  const [editFuncDescricao, setEditFuncDescricao] = useState("");
+  const [editFuncNovidade, setEditFuncNovidade] = useState(false);
+  const [salvandoFuncionalidade, setSalvandoFuncionalidade] = useState(false);
 
   async function carregar() {
     const sb = getSupabase();
@@ -79,6 +92,34 @@ export default function AdminChangelogPage({ params }: { params: Promise<{ slug:
     }
   }
 
+  function handleIniciarEdicaoVersao(versao: Versao) {
+    setVersaoEditandoId(versao.id);
+    setEditNumero(versao.numero);
+    setEditDescricaoVersao(versao.descricao ?? "");
+    setErro(null);
+  }
+
+  function handleCancelarEdicaoVersao() {
+    setVersaoEditandoId(null);
+    setEditNumero("");
+    setEditDescricaoVersao("");
+  }
+
+  async function handleSalvarEdicaoVersao(id: string) {
+    if (!editNumero.trim()) return;
+    setSalvandoVersao(true);
+    setErro(null);
+    try {
+      await atualizarVersao(id, { numero: editNumero.trim(), descricao: editDescricaoVersao.trim() || null });
+      handleCancelarEdicaoVersao();
+      await carregar();
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro ao salvar versão.");
+    } finally {
+      setSalvandoVersao(false);
+    }
+  }
+
   async function handleCriarFuncionalidade(versaoId: string) {
     const nome = novoFuncNomeVersaoId[versaoId]?.trim();
     if (!nome) return;
@@ -119,6 +160,40 @@ export default function AdminChangelogPage({ params }: { params: Promise<{ slug:
     }
   }
 
+  function handleIniciarEdicaoFuncionalidade(func: Funcionalidade) {
+    setFuncEditandoId(func.id);
+    setEditFuncNome(func.nome);
+    setEditFuncDescricao(func.descricao ?? "");
+    setEditFuncNovidade(func.novidade);
+    setErro(null);
+  }
+
+  function handleCancelarEdicaoFuncionalidade() {
+    setFuncEditandoId(null);
+    setEditFuncNome("");
+    setEditFuncDescricao("");
+    setEditFuncNovidade(false);
+  }
+
+  async function handleSalvarEdicaoFuncionalidade(id: string) {
+    if (!editFuncNome.trim()) return;
+    setSalvandoFuncionalidade(true);
+    setErro(null);
+    try {
+      await atualizarFuncionalidade(id, {
+        nome: editFuncNome.trim(),
+        descricao: editFuncDescricao.trim() || null,
+        novidade: editFuncNovidade,
+      });
+      handleCancelarEdicaoFuncionalidade();
+      await carregar();
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro ao salvar funcionalidade.");
+    } finally {
+      setSalvandoFuncionalidade(false);
+    }
+  }
+
   async function handleEnviarImagens(funcionalidadeId: string) {
     const arquivos = arquivosPorFuncionalidade[funcionalidadeId] ?? [];
     if (arquivos.length === 0) return;
@@ -128,7 +203,7 @@ export default function AdminChangelogPage({ params }: { params: Promise<{ slug:
       const qtdAtual = imagens.filter((i) => i.funcionalidade_id === funcionalidadeId).length;
       for (let idx = 0; idx < arquivos.length; idx++) {
         const arquivo = arquivos[idx];
-        const caminho = `changelog/${funcionalidadeId}/${Date.now()}-${arquivo.name}`;
+        const caminho = buildStorageUploadPath(`changelog/${funcionalidadeId}`, arquivo);
         const { error: uploadError } = await getSupabase().storage.from(STORAGE_BUCKET).upload(caminho, arquivo);
         if (uploadError) throw uploadError;
         const { data: pub } = getSupabase().storage.from(STORAGE_BUCKET).getPublicUrl(caminho);
@@ -212,53 +287,159 @@ export default function AdminChangelogPage({ params }: { params: Promise<{ slug:
             const funcionalidadesVersao = funcionalidades
               .filter((f) => f.versao_id === versao.id)
               .sort((a, b) => a.ordem - b.ordem);
+            const editandoVersao = versaoEditandoId === versao.id;
             return (
               <div key={versao.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="flex items-center justify-between gap-3 mb-1">
-                  <h3 className="text-base font-semibold text-slate-800">Versão {versao.numero}</h3>
-                  <button
-                    onClick={() => handleExcluirVersao(versao.id)}
-                    className="inline-flex items-center gap-1 text-xs text-red-500 hover:underline"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    Excluir versão
-                  </button>
-                </div>
-                {versao.descricao && <p className="text-sm text-slate-500 mb-4">{versao.descricao}</p>}
+                {editandoVersao ? (
+                  <div className="space-y-3 mb-4">
+                    <div className="flex gap-3 flex-wrap">
+                      <input
+                        value={editNumero}
+                        onChange={(e) => setEditNumero(e.target.value)}
+                        placeholder="Número (ex.: 1.0)"
+                        className="w-40 text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
+                      />
+                      <input
+                        value={editDescricaoVersao}
+                        onChange={(e) => setEditDescricaoVersao(e.target.value)}
+                        placeholder="Descrição do que essa versão contempla"
+                        className="flex-1 min-w-[240px] text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSalvarEdicaoVersao(versao.id)}
+                        disabled={salvandoVersao}
+                        className="inline-flex items-center gap-1.5 bg-[#2c98b0] hover:bg-[#2c98b0]/90 disabled:opacity-60 text-white font-medium text-xs px-3 py-1.5 rounded-md transition-colors"
+                      >
+                        {salvandoVersao ? "Salvando..." : "Salvar"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancelarEdicaoVersao}
+                        className="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-700 text-xs px-3 py-1.5 rounded-md transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-3 mb-1">
+                    <h3 className="text-base font-semibold text-slate-800">Versão {versao.numero}</h3>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleIniciarEdicaoVersao(versao)}
+                        className="inline-flex items-center gap-1 text-xs text-[#2c98b0] hover:underline"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleExcluirVersao(versao.id)}
+                        className="inline-flex items-center gap-1 text-xs text-red-500 hover:underline"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        Excluir versão
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {!editandoVersao && versao.descricao && <p className="text-sm text-slate-500 mb-4">{versao.descricao}</p>}
 
                 <div className="space-y-3 mb-4">
                   {funcionalidadesVersao.map((func) => {
                     const imagensFunc = imagens.filter((i) => i.funcionalidade_id === func.id);
                     const arquivos = arquivosPorFuncionalidade[func.id] ?? [];
                     const enviando = enviandoPorFuncionalidade[func.id] ?? false;
+                    const editandoFunc = funcEditandoId === func.id;
                     return (
                       <div key={func.id} className="rounded-lg border border-gray-100 p-4 bg-gray-50">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-medium text-slate-800">{func.nome}</p>
-                            <button
-                              type="button"
-                              onClick={() => handleToggleNovidade(func)}
-                              className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full transition-colors ${
-                                func.novidade
-                                  ? "text-amber-600 bg-amber-50 ring-1 ring-amber-100"
-                                  : "text-slate-400 bg-white ring-1 ring-gray-200 hover:text-amber-500"
-                              }`}
-                              title="Marcar/desmarcar como Novidade"
-                            >
-                              <Sparkles className="w-3 h-3" />
-                              Novidade
-                            </button>
+                        {editandoFunc ? (
+                          <div className="space-y-2 mb-3">
+                            <input
+                              value={editFuncNome}
+                              onChange={(e) => setEditFuncNome(e.target.value)}
+                              placeholder="Nome (ex.: Vendas)"
+                              className="w-full text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
+                            />
+                            <textarea
+                              value={editFuncDescricao}
+                              onChange={(e) => setEditFuncDescricao(e.target.value)}
+                              rows={2}
+                              placeholder="O que essa funcionalidade faz..."
+                              className="w-full text-sm p-2 rounded border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#2c98b0]"
+                            />
+                            <label className="flex items-center gap-1.5 text-xs text-slate-500">
+                              <input
+                                type="checkbox"
+                                checked={editFuncNovidade}
+                                onChange={(e) => setEditFuncNovidade(e.target.checked)}
+                              />
+                              Marcar como Novidade
+                            </label>
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleSalvarEdicaoFuncionalidade(func.id)}
+                                disabled={salvandoFuncionalidade}
+                                className="inline-flex items-center gap-1.5 bg-[#2c98b0] hover:bg-[#2c98b0]/90 disabled:opacity-60 text-white font-medium text-xs px-3 py-1.5 rounded-md transition-colors"
+                              >
+                                {salvandoFuncionalidade ? "Salvando..." : "Salvar"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleCancelarEdicaoFuncionalidade}
+                                className="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-700 text-xs px-3 py-1.5 rounded-md transition-colors"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                Cancelar
+                              </button>
+                            </div>
                           </div>
-                          <button
-                            onClick={() => handleExcluirFuncionalidade(func.id)}
-                            className="text-red-500 hover:text-red-600"
-                            title="Excluir funcionalidade"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                        {func.descricao && <p className="text-sm text-slate-600 whitespace-pre-line mb-3">{func.descricao}</p>}
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium text-slate-800">{func.nome}</p>
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleNovidade(func)}
+                                  className={`inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full transition-colors ${
+                                    func.novidade
+                                      ? "text-amber-600 bg-amber-50 ring-1 ring-amber-100"
+                                      : "text-slate-400 bg-white ring-1 ring-gray-200 hover:text-amber-500"
+                                  }`}
+                                  title="Marcar/desmarcar como Novidade"
+                                >
+                                  <Sparkles className="w-3 h-3" />
+                                  Novidade
+                                </button>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={() => handleIniciarEdicaoFuncionalidade(func)}
+                                  className="inline-flex items-center gap-1 text-xs text-[#2c98b0] hover:underline"
+                                  title="Editar funcionalidade"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleExcluirFuncionalidade(func.id)}
+                                  className="text-red-500 hover:text-red-600"
+                                  title="Excluir funcionalidade"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                            {func.descricao && <p className="text-sm text-slate-600 whitespace-pre-line mb-3">{func.descricao}</p>}
+                          </>
+                        )}
 
                         {imagensFunc.length > 0 && (
                           <div className="grid grid-cols-3 gap-2 mb-3">

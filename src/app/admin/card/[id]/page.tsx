@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, Pencil, Trash2, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
+import { buildStorageUploadPath } from "@/lib/storage-path";
 import {
   getCardPorId,
   getIteracoesPorCard,
@@ -86,7 +87,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
     try {
       const iteracao = await criarIteracao(id, novaIteracao.trim());
       for (const arquivo of arquivos) {
-        const caminho = `${id}/${Date.now()}-${arquivo.name}`;
+        const caminho = buildStorageUploadPath(id, arquivo);
         const { error: uploadError } = await getSupabase()
           .storage.from(STORAGE_BUCKET)
           .upload(caminho, arquivo);
@@ -148,7 +149,7 @@ export default function AdminCardPage({ params }: { params: Promise<{ id: string
     try {
       await atualizarIteracao(iteracaoId, editCorpo.trim());
       for (const editArquivo of editArquivos) {
-        const caminho = `${id}/${Date.now()}-${editArquivo.name}`;
+        const caminho = buildStorageUploadPath(id, editArquivo);
         const { error: uploadError } = await getSupabase()
           .storage.from(STORAGE_BUCKET)
           .upload(caminho, editArquivo);

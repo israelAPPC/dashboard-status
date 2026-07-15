@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ImagePlus, X } from "lucide-react";
 import { getSupabase, STORAGE_BUCKET } from "@/lib/supabase";
+import { buildStorageUploadPath } from "@/lib/storage-path";
 import { getUserRole, getUserId, getUserNome } from "@/lib/auth-role";
 import { getProjetos, criarDemanda, criarAnexo } from "@/lib/kanban";
 import BackLink from "@/components/BackLink";
@@ -110,7 +111,7 @@ function NovaDemandaForm() {
       });
 
       for (const arquivo of imagens) {
-        const caminho = `${card.id}/${Date.now()}-${arquivo.name}`;
+        const caminho = buildStorageUploadPath(card.id, arquivo);
         const { error: uploadError } = await getSupabase()
           .storage.from(STORAGE_BUCKET)
           .upload(caminho, arquivo);

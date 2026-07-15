@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { History, Settings2, Sparkles, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, History, Settings2, Sparkles, X } from "lucide-react";
 import {
   getVersoesPorProjeto,
   getFuncionalidadesPorVersoes,
@@ -27,10 +27,22 @@ export default function ChangelogModal({ projetoId, projetoSlug }: { projetoId: 
   const [versaoAbertaId, setVersaoAbertaId] = useState<string | null>(null);
   const [funcionalidadeAtivaId, setFuncionalidadeAtivaId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     getUserRole().then((r) => setIsAdmin(r === "admin"));
   }, []);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setLightboxIndex(null);
+      if (e.key === "ArrowRight") setLightboxIndex((i) => (i === null ? i : i + 1));
+      if (e.key === "ArrowLeft") setLightboxIndex((i) => (i === null ? i : i - 1));
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxIndex]);
 
   async function abrir() {
     setAberto(true);
@@ -199,8 +211,13 @@ export default function ChangelogModal({ projetoId, projetoSlug }: { projetoId: 
                                   )}
                                   {imagensDaFuncionalidade.length > 0 && (
                                     <div className="grid grid-cols-2 gap-2">
-                                      {imagensDaFuncionalidade.map((img) => (
-                                        <div key={img.id} className="rounded-lg overflow-hidden border border-gray-100">
+                                      {imagensDaFuncionalidade.map((img, index) => (
+                                        <button
+                                          key={img.id}
+                                          type="button"
+                                          onClick={() => setLightboxIndex(index)}
+                                          className="rounded-lg overflow-hidden border border-gray-100 cursor-zoom-in hover:opacity-90 transition-opacity"
+                                        >
                                           <Image
                                             src={img.url}
                                             alt={img.nome ?? funcionalidadeAtiva.nome}
@@ -208,7 +225,7 @@ export default function ChangelogModal({ projetoId, projetoSlug }: { projetoId: 
                                             height={300}
                                             className="w-full h-auto"
                                           />
-                                        </div>
+                                        </button>
                                       ))}
                                     </div>
                                   )}
@@ -223,8 +240,105 @@ export default function ChangelogModal({ projetoId, projetoSlug }: { projetoId: 
                 })}
             </div>
           </div>
+
+          {lightboxIndex !== null && imagensDaFuncionalidade.length > 0 && (
+            <LightboxOverlay
+              imagens={imagensDaFuncionalidade}
+              indice={((lightboxIndex % imagensDaFuncionalidade.length) + imagensDaFuncionalidade.length) % imagensDaFuncionalidade.length}
+              alt={funcionalidadeAtiva?.nome ?? ""}
+              onFechar={() => setLightboxIndex(null)}
+              onAnterior={() => setLightboxIndex((i) => (i === null ? i : i - 1))}
+              onProxima={() => setLightboxIndex((i) => (i === null ? i : i + 1))}
+            />
+          )}
         </div>
       )}
     </>
+  );
+}
+
+function LightboxOverlay({
+  imagens,
+  indice,
+  alt,
+  onFechar,
+  onAnterior,
+  onProxima,
+}: {
+  imagens: FuncionalidadeImagem[];
+  indice: number;
+  alt: string;
+  onFechar: () => void;
+  onAnterior: () => void;
+  onProxima: () => void;
+}) {
+  const imagem = imagens[indice];
+  const temNavegacao = imagens.length > 1;
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4"
+      onClick={(e) => {
+        e.stopPropagation();
+        onFechar();
+      }}
+    >
+      <button
+        type="button"
+        onClick={onFechar}
+        className="absolute top-4 right-4 text-white/80 hover:text-white"
+        title="Fechar (Esc)"
+      >
+        <X className="w-7 h-7" />
+      </button>
+
+      {temNavegacao && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAnterior();
+          }}
+          className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/30 hover:bg-black/50 rounded-full p-2 transition-colors"
+          title="Imagem anterior"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+      )}
+
+      <div
+        className="relative max-w-[90vw] max-h-[85vh] flex items-center justify-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Image
+          key={imagem.id}
+          src={imagem.url}
+          alt={imagem.nome ?? alt}
+          width={1600}
+          height={1000}
+          className="max-w-[90vw] max-h-[85vh] w-auto h-auto object-contain rounded-lg"
+        />
+      </div>
+
+      {temNavegacao && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onProxima();
+          }}
+          className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/30 hover:bg-black/50 rounded-full p-2 transition-colors"
+          title="Próxima imagem"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      )}
+
+      {temNavegacao && (
+        <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs text-white/70">
+          {indice + 1} / {imagens.length}
+        </span>
+      )}
+    </div>
   );
 }
