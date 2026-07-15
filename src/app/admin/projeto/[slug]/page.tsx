@@ -157,7 +157,15 @@ export default function AdminProjetoPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div>
-      <h1 className="text-xl font-semibold text-slate-800 mb-6">{projeto.nome} — Kanban</h1>
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <h1 className="text-xl font-semibold text-slate-800">{projeto.nome} — Kanban</h1>
+        <Link
+          href={`/admin/projeto/${slug}/changelog`}
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 border border-gray-200 rounded-lg px-3 py-1.5 hover:border-[#2c98b0]/40 hover:text-[#2c98b0] transition-colors"
+        >
+          Versões / Changelog
+        </Link>
+      </div>
 
       <form onSubmit={handleCriarCategoria} className="flex gap-2 mb-8">
         <input

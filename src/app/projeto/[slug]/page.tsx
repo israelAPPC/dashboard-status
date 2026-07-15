@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getProjetoPorSlug, getCategoriasPorProjeto, getCardsPorCategorias } from "@/lib/kanban";
 import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
 import ReportarDemandaLink from "@/components/ReportarDemandaLink";
+import ChangelogModal from "@/components/ChangelogModal";
 import type { Status } from "@/lib/supabase-types";
 
 export const revalidate = 0;
@@ -33,7 +34,10 @@ export default async function ProjetoPage({
       </Link>
 
       <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-        <h1 className="text-xl font-semibold text-slate-800">{projeto.nome}</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-semibold text-slate-800">{projeto.nome}</h1>
+          <ChangelogModal projetoId={projeto.id} projetoSlug={projeto.slug} />
+        </div>
         <ReportarDemandaLink projetoSlug={projeto.slug} />
       </div>
 

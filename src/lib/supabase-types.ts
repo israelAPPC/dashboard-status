@@ -53,3 +53,31 @@ export type Anexo = {
   nome: string | null;
   created_at: string;
 };
+
+export type Versao = {
+  id: string;
+  projeto_id: string;
+  numero: string;
+  descricao: string | null;
+  ordem: number;
+  created_at: string;
+};
+
+export type Funcionalidade = {
+  id: string;
+  versao_id: string;
+  nome: string;
+  descricao: string | null;
+  novidade: boolean;
+  ordem: number;
+  created_at: string;
+};
+
+export type FuncionalidadeImagem = {
+  id: string;
+  funcionalidade_id: string;
+  url: string;
+  nome: string | null;
+  ordem: number;
+  created_at: string;
+};
