@@ -81,3 +81,12 @@ export type FuncionalidadeImagem = {
   ordem: number;
   created_at: string;
 };
+
+export type RoadmapItem = {
+  id: string;
+  projeto_id: string;
+  titulo: string;
+  descricao: string | null;
+  ordem: number;
+  created_at: string;
+};

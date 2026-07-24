@@ -5,6 +5,7 @@ import { getProjetoPorSlug, getCategoriasPorProjeto, getCardsPorCategorias } fro
 import { STATUS_LABEL, STATUS_CLASSES, STATUS_DOT, TIPO_LABEL, TIPO_CLASSES } from "@/lib/status";
 import ReportarDemandaLink from "@/components/ReportarDemandaLink";
 import ChangelogModal from "@/components/ChangelogModal";
+import RoadmapModal from "@/components/RoadmapModal";
 import type { Status } from "@/lib/supabase-types";
 
 export const revalidate = 0;
@@ -23,6 +24,11 @@ export default async function ProjetoPage({
   const categorias = await getCategoriasPorProjeto(projeto.id);
   const cards = await getCardsPorCategorias(categorias.map((c) => c.id));
 
+  const totalPorStatus = COLUNAS.map((status) => ({
+    status,
+    total: cards.filter((c) => c.status === status).length,
+  }));
+
   return (
     <div>
       <Link
@@ -33,12 +39,33 @@ export default async function ProjetoPage({
         Voltar aos projetos
       </Link>
 
-      <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
+        <div>
           <h1 className="text-xl font-semibold text-slate-800">{projeto.nome}</h1>
-          <ChangelogModal projetoId={projeto.id} projetoSlug={projeto.slug} />
+          {projeto.descricao && <p className="text-sm text-slate-500 mt-1 max-w-2xl">{projeto.descricao}</p>}
         </div>
         <ReportarDemandaLink projetoSlug={projeto.slug} />
+      </div>
+
+      <div className="flex items-center gap-2 flex-wrap mb-6">
+        <ChangelogModal projetoId={projeto.id} projetoSlug={projeto.slug} />
+        <RoadmapModal projetoId={projeto.id} projetoSlug={projeto.slug} />
+
+        {cards.length > 0 && (
+          <div className="flex items-center gap-1.5 ml-1 flex-wrap">
+            {totalPorStatus
+              .filter((s) => s.total > 0)
+              .map((s) => (
+                <span
+                  key={s.status}
+                  className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-1 rounded-full ${STATUS_CLASSES[s.status]}`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[s.status]}`} />
+                  {STATUS_LABEL[s.status]} · {s.total}
+                </span>
+              ))}
+          </div>
+        )}
       </div>
 
       {categorias.length === 0 ? (
